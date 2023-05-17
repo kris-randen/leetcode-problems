@@ -50,14 +50,18 @@ Acceptance Rate
 76.5%
 
 """
+import string
+from heapq import *
 
 class UnionFind:
-    def __init__(self, n, count=None):
-        self.__size = n
-        self.__ind = range(self.__size)
+    def __init__(self, n=0, nodes=None, count=None):
+        self.__nodes = nodes
+        self.__node_map = {node: index for index, node in enumerate(self.__nodes)}
+        self.__n = n if self.__nodes is None else len(nodes)
+        self.__ind = range(self.__n)
         self.__id = [node for node in self.__ind]
-        self.__sz = [1 for node in self.__ind]
-        self.__count = self.__size if count is None else count
+        self.__count = self.__n if count is None else count
+        self.__components = {root: [root] for root in self.__ind}
 
     def __parent(self, node):
         return self.__id[node]
@@ -78,33 +82,60 @@ class UnionFind:
             self.__assign(node=node, parent=root)
 
     def __size(self, root):
-        return self.__sz[root]
-
-    def __size_up(self, large, small):
-        self.__sz[large] += self.__sz[small]
+        return len(self.__components[root])
 
     def __separate(self, a, b):
-        p, q = self.__root(a), self.__root(b)
+        p, q = self.root(a), self.root(b)
         small = p if self.__size(p) < self.__size(q) else q
         large = q if self.__size(q) > self.__size(p) else p
         return small, large
 
-    def __root(self, node):
+    def __merge(self, large, small):
+        for node in self.__components.pop(small):
+            heappush(self.__components[large], node)
+
+    def root(self, node):
         path = self.__path(node)
         self.__compress(path)
         return path[-1]
+
+    def find_index(self, node):
+        index = self.__node_map[node]
+        return self.__components[self.root(index)][0]
+
+    def find(self, node):
+        index = self.find_index(node)
+        return index if self.__nodes is None else self.__nodes[index]
 
     def count(self):
         return self.__count
 
     def connected(self, a, b):
-        return self.__root(a) == self.__root(b)
+        return self.root(a) == self.root(b)
 
-    def union(self, a, b):
+    def union_index(self, a, b):
         if self.connected(a, b):
             return
         s, l = self.__separate(a, b)
         self.__assign(node=s, parent=l)
-        self.__size_up(l, s)
+        self.__merge(l, s)
+        self.__count -= 1
 
+    def union(self, a, b):
+        self.union_index(self.__node_map[a], self.__node_map[b])
 
+    def print(self):
+        print(f"node map = {self.__node_map}")
+        print(f"components = {self.__components}")
+
+def smallestEquivalentString(s1: str, s2: str, baseStr: str) -> str:
+    components = UnionFind(nodes=list(string.ascii_lowercase))
+    components.print()
+    for ind, char in enumerate(s1):
+        print(type(ind), ind, char, s1[ind])
+        components.union(s1[ind], s2[ind])
+
+    return "".join(map(lambda x: components.find(x), baseStr))
+
+if __name__ == '__main__':
+    print(smallestEquivalentString('parker', 'morris', 'parser'))
