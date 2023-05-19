@@ -1,44 +1,40 @@
 from functools import reduce
 from typing import List
 
-class UnionFind:
+class Node:
+    def __init__(self, val, parent=None, children=None, root=None):
+        self.val = val
+        self.parent = parent
+        self.children = [] if children is None else children
+        self.root = self if root is None else root
+
+    def assign_root(self, root) -> bool:
+        if self.root is root:
+            return False
+        self.root = root
+        for child in self.children:
+            child.assign_root(root)
+        return True
+
+class UnionFindGraph:
     def __init__(self, n, count=None):
-        self.size = n
-        self.indices = range(self.size)
-        self.id = [i for i in self.indices]
-        self.sz = [1 for i in self.indices]
-        self.count = self.size if count is None else count
+        self.n = n
+        self.nodes = [Node(i) for i in range(n)]
+        self.comps = {root: [root] for root in self.nodes}
+        self.count = len(self.comps)
 
-    def parent(self, node):
-        parent = self.id[node]
-        while node != parent:
-            yield self.id[node]
-
-    def path(self, node):
-        pass
-
-    def root(self, node):
-        pass
-
-    def root(self, i):
-        #Defining path while traversing up for path compression
-        path = [i]
-        while i != self.id[i]:
-            #Traversing up
-            i = self.id[i]
-            path.append(i)
-
-        #Now we are at the root, so we return i but before that
-        #we make sure to compress the path
-
-        for node in path:
-            self.id[node] = i
-
-        return i
-
-
-
+    def add_edge(self, parent_index, child_index) -> bool:
+        parent = self.nodes[parent_index]
+        child = self.nodes[child_index]
+        child.parent = parent
+        parent.children.append(child)
+        return child.assign_root(parent.root)
 
 class Solution:
     def findRedundantDirectedConnection(self, edges: List[List[int]]) -> List[int]:
-        return [0]
+        graph = UnionFindGraph(len(edges))
+        redundant = []
+        for edge in edges:
+            if not graph.add_edge(edge[0]-1, edge[1]-1):
+                redundant.append(edge)
+        return redundant[-1]
