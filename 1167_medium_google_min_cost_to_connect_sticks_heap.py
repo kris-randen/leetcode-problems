@@ -1,50 +1,58 @@
 """
-451. Sort Characters By Frequency
+1167. Minimum Cost to Connect Sticks
 Medium
-company
-Bloomberg
+1.2K
+152
 company
 Amazon
+JPMorgan
 company
-Microsoft
-Given a string s, sort it in decreasing order based on the frequency of the characters. The frequency of a character is the number of times it appears in the string.
+Google
+You have some number of sticks with positive integer lengths. These lengths are given as an array sticks, where sticks[i] is the length of the ith stick.
 
-Return the sorted string. If there are multiple answers, return any of them.
+You can connect any two sticks of lengths x and y into one stick by paying a cost of x + y. You must connect all the sticks until there is only one stick remaining.
+
+Return the minimum cost of connecting all the given sticks into one stick in this way.
 
 
 
 Example 1:
 
-Input: s = "tree"
-Output: "eert"
-Explanation: 'e' appears twice while 'r' and 't' both appear once.
-So 'e' must appear before both 'r' and 't'. Therefore "eetr" is also a valid answer.
+Input: sticks = [2,4,3]
+Output: 14
+Explanation: You start with sticks = [2,4,3].
+1. Combine sticks 2 and 3 for a cost of 2 + 3 = 5. Now you have sticks = [5,4].
+2. Combine sticks 5 and 4 for a cost of 5 + 4 = 9. Now you have sticks = [9].
+There is only one stick left, so you are done. The total cost is 5 + 9 = 14.
 Example 2:
 
-Input: s = "cccaaa"
-Output: "aaaccc"
-Explanation: Both 'c' and 'a' appear three times, so both "cccaaa" and "aaaccc" are valid answers.
-Note that "cacaca" is incorrect, as the same characters must be together.
+Input: sticks = [1,8,3,5]
+Output: 30
+Explanation: You start with sticks = [1,8,3,5].
+1. Combine sticks 1 and 3 for a cost of 1 + 3 = 4. Now you have sticks = [4,8,5].
+2. Combine sticks 4 and 5 for a cost of 4 + 5 = 9. Now you have sticks = [9,8].
+3. Combine sticks 9 and 8 for a cost of 9 + 8 = 17. Now you have sticks = [17].
+There is only one stick left, so you are done. The total cost is 4 + 9 + 17 = 30.
 Example 3:
 
-Input: s = "Aabb"
-Output: "bbAa"
-Explanation: "bbaA" is also a valid answer, but "Aabb" is incorrect.
-Note that 'A' and 'a' are treated as two different characters.
+Input: sticks = [5]
+Output: 0
+Explanation: There is only one stick, so you don't need to do anything. The total cost is 0.
 
 
 Constraints:
 
-1 <= s.length <= 5 * 105
-s consists of uppercase and lowercase English letters and digits.
+1 <= sticks.length <= 104
+1 <= sticks[i] <= 104
 Accepted
-510.6K
+105.1K
 Submissions
-727.8K
+153.2K
 Acceptance Rate
-70.1%
-
+68.6%
 """
+from typing import List
+
 
 class PriorityQueue:
     def __init__(self, keys=None, order=None):
@@ -53,14 +61,11 @@ class PriorityQueue:
         self.order = (lambda x, y: x if x <= y else y) if order is None else order
         self.heapify()
 
-    def size(self):
-        return len(self.keys) - 1 if self.N is None else self.N
-
-    def is_empty(self):
-        return self.size() == 0
-
     def root(self):
         return 1
+
+    def size(self):
+        return len(self.keys) - 1 if self.N is None else self.N
 
     def last(self):
         return self.size()
@@ -83,19 +88,17 @@ class PriorityQueue:
     def is_legit(self, node):
         return self.root() <= node <= self.last()
 
+    def legit(self, node):
+        return node if self.is_legit(node) else None
+
     def left(self, parent):
-        left = self.left_index(parent)
-        return left if self.is_legit(left) else None
+        return self.legit(self.left_index(parent))
 
     def right(self, parent):
-        right = self.right_index(parent)
-        return right if self.is_legit(right) else None
+        return self.legit(self.right_index(parent))
 
-    def is_leaf(self, node):
-        return self.left(node) is None
-
-    def is_root(self, node):
-        return node == self.root()
+    def parent(self, child):
+        return self.legit(self.up(child))
 
     def ordered(self, i, j):
         k, l = self.key(i), self.key(j)
@@ -106,14 +109,11 @@ class PriorityQueue:
             return None
         if i and j:
             return self.ordered(i, j)
-        return i if not j else j
+        return i if j is None else j
 
     def child(self, parent):
         return self.preferred(self.left(parent), self.right(parent))
 
-    def parent(self, child):
-        parent = self.up(child)
-        return parent if self.is_legit(parent) else None
 
     def balanced(self, parent, child):
         return self.preferred(parent, child) == parent
@@ -134,41 +134,37 @@ class PriorityQueue:
 
     def lift(self, child):
         parent = self.unbalanced_parent(child)
-        if parent is None:
-            return
-        self.swap(child, parent)
+        if parent is not None:
+            self.swap(child, parent)
         return parent
 
     def drop(self, parent):
         child = self.unbalanced_child(parent)
-        if child is None:
-            return
-        self.swap(parent, child)
+        if child is not None:
+            self.swap(parent, child)
         return child
 
     def swim(self, child):
-        while self.unbalanced_parent(child) is not None:
+        while self.unbalanced_parent(child):
             child = self.lift(child)
 
     def sink(self, parent):
-        while self.unbalanced_child(parent) is not None:
+        while self.unbalanced_child(parent):
             parent = self.drop(parent)
 
     def heapify(self):
         for node in reversed(range(1, self.last())):
             self.sink(node)
 
+    def push(self, key):
+        self.keys.append(key)
+        self.swim(self.last())
+
     def pop(self):
-        if self.is_empty():
-            return None
         self.swap(self.root(), self.last())
         top = self.keys.pop()
         self.sink(self.root())
         return top
-
-    def push(self, key):
-        self.keys.append(key)
-        self.swim(self.last())
 
     def sort(self):
         self.N = self.size()
@@ -177,10 +173,10 @@ class PriorityQueue:
             self.N -= 1
             self.sink(self.root())
         self.N = None
+        return self.keys[1:]
 
     def sorted(self):
-        self.sort()
-        result = self.keys[1:]
+        result = self.sort()
         self.heapify()
         return result
 
@@ -188,32 +184,21 @@ class PriorityQueue:
         print(self.keys[1:])
 
 class Solution:
-    def frequencySort(self, s: str) -> str:
-        order = lambda x, y: x if x[1] >= y[1] else y
-
-        frequency = {}
-        for char in s:
-            if char in frequency:
-                frequency[char] += 1
-            else:
-                frequency[char] = 1
-
-        pq = PriorityQueue(keys=list(frequency.items()), order=order)
-
-        result = ""
-        while not pq.is_empty():
-            top = pq.pop()
-            result += top[0] * top[1]
-        return result
-
+    def connectSticks(self, sticks: List[int]) -> int:
+        if len(sticks) <= 1:
+            return 0
+        pq = PriorityQueue(keys=sticks)
+        cost = 0
+        while pq.size() > 1:
+            first, second = pq.pop(), pq.pop()
+            cost += first + second
+            pq.push(first + second)
+        return cost
 
 if __name__ == '__main__':
     keys = [2, 3, 1, 5, 4, 7, 13, 27, 43, 12, 11]
     heap = PriorityQueue(keys=keys)
     print(heap.keys)
-    print(heap.sorted())
-    heap.print()
     heap.sort()
     heap.print()
-
 
