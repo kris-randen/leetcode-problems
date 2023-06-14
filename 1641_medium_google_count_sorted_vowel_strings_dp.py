@@ -51,15 +51,12 @@ Output: 66045
 # a(2) = 1, e(2) = 2, i(2) = 3, o(2) = 4, u(2) = 5
 
 def fibonacci_nd(k, n):
-    prev = [1] * (k + 1)
-    prev[0] = 0
     curr = [1] * (k + 1)
     curr[0] = 0
 
     for i in range(1, n):
         for k in range(1, k + 1):
-            curr[k] = curr[k - 1] + prev[k]
-        prev = curr
+            curr[k] = curr[k - 1] + curr[k]
 
     return sum(curr)
 
