@@ -47,8 +47,10 @@ Output: 66045
 # e(n + 1) = a(n + 1) + e(n)
 # i(n + 1) = e(n + 1) + i(n)
 #...
+# sum(a(n + 1) + e(n + 1) ... u(n + 1)) = a(n) + a(n) + e(n) + a(n) + e(n) + i(n) + ... = 5 * a(n) + 4 * e(n) .. + u(n)
 # a(1) = e(1) = ... = u(1) = 1
 # a(2) = 1, e(2) = 2, i(2) = 3, o(2) = 4, u(2) = 5
+# curr = curr
 
 def fibonacci_nd(k, n):
     curr = [1] * (k + 1)
