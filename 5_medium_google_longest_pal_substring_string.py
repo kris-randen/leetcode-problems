@@ -74,28 +74,22 @@ def index(c):
 
 def update_start_max(start_max, index, length):
     start, max_length = start_max
-    if length > max_length:
-        start_max[0] = index
-        start_max[1] = length
+    if length > max_length: start_max[0], start_max[1] = index, length
 
 def max_palindrome(s):
     n = len(s)
-    if n < 2:
-        return s
+    if n < 2: return s
     centers = [_ for _ in range(2*n - 1)]
-    start, max_length = 0, 1
-    start_max = [start, max_length]
+    start_max_length = [0, 1]
 
-    for center in centers:
-        centred_palindrome(s, center, start_max)
-    start, max_length = start_max
+    for center in centers: centred_palindrome(s, center, start_max_length)
+    start, max_length = start_max_length
     return s[start:start + max_length]
 
 def centred_palindrome(s, c, start_max):
     i, n, indices, even, radius = 0, len(s), index(c), (c + 1) % 2 == 0, start_max[1] // 2
     l, r = (indices[0], indices[1]) if even else (indices[0], indices[0])
-    if l - radius < 0 or r + radius > n - 1:
-        return
+    if l - radius < 0 or r + radius > n - 1: return
     while l - i >= 0 and r + i < n and s[l - i] == s[r + i]:
         length = (2 * i + 1) if not even else 2*(i + 1)
         update_start_max(start_max, l - i, length)
@@ -103,4 +97,4 @@ def centred_palindrome(s, c, start_max):
 
 
 if __name__ == '__main__':
-    print(max_palindrome("cbbd"))
+    print(max_palindrome("babad"))
