@@ -102,6 +102,5 @@ def centred_palindrome(s, c, start_max):
         i += 1
 
 
-
 if __name__ == '__main__':
     print(max_palindrome("cbbd"))
