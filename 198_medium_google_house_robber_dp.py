@@ -46,3 +46,4 @@ def max_loot(sums):
         loot[i] = max(loot[i - 1], loot[i - 2] + sums[i])
 
     return loot[n - 1]
+
