@@ -90,6 +90,6 @@ if __name__ == '__main__':
     # Fraction of boxes a prisoner is allowed to open
     f = 0.5
     # Fraction of prisoners requried to succeed
-    q = 0.9
-    successes, failures = prisoners_escape_solve(n, f=f, q=q, cycles=False)
+    q = 1
+    successes, failures = prisoners_escape_solve(n, f=f, q=q, cycles=True)
     print(f"successes = {successes}, failures = {failures}")
