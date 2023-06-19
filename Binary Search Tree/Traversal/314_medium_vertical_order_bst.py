@@ -89,7 +89,7 @@ def collect(nodes):
     return items
 
 
-def vertical_order(node):
+def vertical_order_long(node):
     if not node: return []
     path, c, vals = [], [], []
     path = level_order_col(node)
@@ -107,6 +107,15 @@ def vertical_order(node):
             vals.append(n.node.val)
         c.append(vals)
     return c
+
+from collections import defaultdict
+
+def vertical_order(node):
+    cols, q = defaultdict(list), [(node, 0)]
+    for p, i in q:
+        if p: cols[i].append(p.val); q += (p.left, i - 1), (p.right, i + 1)
+    return [cols[i] for i in sorted(cols)]
+
 
 
 
