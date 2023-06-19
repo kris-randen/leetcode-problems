@@ -30,10 +30,9 @@ Output: []
 
 from queue import Queue
 
-def level_order(node, path):
+def level_order_leet(node, path):
     if not node: return
-    q = Queue()
-    q.put([node])
+    q = Queue(); q.put([node])
     while not q.empty():
         ps = q.get()
         cs, vals = [], []
@@ -47,3 +46,8 @@ def level_order(node, path):
         path.append(vals)
     return path
 
+def level_order(node):
+    q, path = [node], []
+    for p in q:
+       if p: path.append(p.val); q += p.left, p.right
+    return path
