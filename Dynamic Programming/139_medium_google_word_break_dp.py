@@ -32,6 +32,27 @@ Input: s = "catsandog", wordDict = ["cats","dog","sand","and","cat"]
 Output: false
 """
 
+# Word Break Practice on 19th Jun
+def word_break_01(s, word_dict):
+    if not s: return True
+    dp = [False for _ in range(len(s))]
+    for i in range(len(s)):
+        for word in word_dict:
+            l = len(word)
+            if i >= l - 1 and not dp[i]:
+                dp[i] = (s[i - l + 1: i + 1] == word) and ((i - l == -1) or dp[i - l])
+    return dp[-1]
+
+
+
+
+
+
+
+
+
+
+
 def word_break_dp(s, words):
     dp = [False for _ in range(len(s))]
     for i in range(len(s)):

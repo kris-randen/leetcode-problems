@@ -37,6 +37,42 @@ Input: root = [], key = 0
 Output: []
 """
 
+# Delete Practice on 19th June 2023
+
+def min_01(node):
+    if not node: return None
+    if not node.left: return node
+    return min_01(node.left)
+
+
+def delete_min_01(node):
+    if not node: return None
+    if not node.left: return node.right
+    node.left = delete_min_01(node.left)
+    return node
+
+def delete_01(node, key):
+    if not node: return None
+    if key < node.val: node.left = delete_01(node.left, key)
+    if key > node.val: node.right = delete_01(node.right, key)
+    if key == node.val:
+        if not node.left: return node.right
+        if not node.right: return node.left
+        t = node
+        node = min(t.right)
+        node.right = delete_min_01(t.right)
+        node.left = t.left
+    return node
+
+
+
+
+
+
+
+
+
+
 def find(node, key):
     if not node: return None
     if key == node.val: return node.val

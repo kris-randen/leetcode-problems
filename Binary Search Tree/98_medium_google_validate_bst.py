@@ -46,7 +46,29 @@ class TreeNode:
         self.left = left
         self.right = right
 
+
+
+# Validate BST Practice on 19th Jun
+def validate_01(node, less=float('inf'), more=float('-inf')):
+    if not node: return True
+    if node.val >= less or node.val <= more: return False
+    return validate_01(node.left, min(less, node.val), more) and \
+           validate_01(node.right, less, max(more, node.val))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def validate(node: TreeNode, less=float('inf'), more=float('-inf')):
     if not node: return True
-    if node.val > less or node.val < more: return False
+    if node.val >= less or node.val <= more: return False
     return validate(node.left, min(less, node.val), more) and validate(node.right, less, max(more, node.val))
