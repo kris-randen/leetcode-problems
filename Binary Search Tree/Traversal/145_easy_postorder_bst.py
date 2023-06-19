@@ -28,6 +28,23 @@ Input: root = [1]
 Output: [1]
 """
 
+from collections import deque
+
+def postorder_stack(node, path):
+    if not node: return
+    de, visited = deque([node]), set()
+    while len(de) != 0:
+        p = de[-1]
+        if p.left and p.left not in visited:
+            de.append(p.left)
+        if not p.left or p.left in visited:
+            if p.right and p.right not in visited: de.append(p.right)
+            else:
+                p = de.pop()
+                # if p not in visited:
+                path.append(p.val); visited.add(p)
+
+
 def postorder(node, path):
     if not node: return
     postorder(node.left, path)

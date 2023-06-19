@@ -36,6 +36,20 @@ class TreeNode:
         self.left = left
         self.right = right
 
+def children(node):
+    if not node: return []
+    if not node.left and not node.right: return []
+    if not node.left: return [node.right]
+    if not node.right: return [node.left]
+    return [node.left, node.right]
+
+def grandchildren(node):
+    if not node: return []
+    if not node.left and not node.right: return []
+    if not node.left: return children(node.right)
+    if not node.right: return children(node.left)
+    return children(node.left) + children(node.right)
+
 def preorder_stack(node, path):
     if not node: return
     de, visited = deque([node]), set()
