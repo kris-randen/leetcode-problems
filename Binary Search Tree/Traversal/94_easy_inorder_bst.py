@@ -28,6 +28,8 @@ Input: root = [1]
 Output: [1]
 """
 
+from collections import deque
+
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
         self.val = val
@@ -39,4 +41,20 @@ def inorder(node, path):
     inorder(node.left, path)
     path.append(node)
     inorder(node.right, path)
+
+def inorder_stack(node, path):
+    if not node: return
+    de, visited = deque(), set()
+    de.append(node)
+    while len(de) != 0:
+        p = de[-1]  # peek
+        if p.left and p.left not in visited:
+            de.append(p.left)
+        if not p.left or p.left in visited:
+            p = de.pop()
+            path.append(p.val)
+            visited.add(p)
+            if not p.right or p.right in visited:
+                continue
+            else: de.append(p.right)
 
