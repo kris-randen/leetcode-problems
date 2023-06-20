@@ -1,12 +1,10 @@
 from copy import deepcopy
 
 class PriorityQueue:
-    def __init__(self, order=None, keys=None):
+    def __init__(self, keys=None, order=None):
         self.N = None
-        self.order = lambda x, y: x if x <= y else y if not order else order
-        self.keys = [None]
-        if keys:
-            self.keys[1:] = keys
+        self.order = (lambda x, y: x if x <= y else y) if not order else order
+        self.keys = [None] + keys if keys else [None]
         self.heapify()
 
     def root(self):
