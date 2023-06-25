@@ -32,6 +32,8 @@ Explanation: It is not possible to change at most one cell such that there is no
 
 from enum import Enum
 
+from collections import defaultdict
+
 
 class PointType(Enum):
     INTERIOR = 1
@@ -144,19 +146,13 @@ class Graph:
 class DFS:
     def __init__(self, graph: Graph):
         self.g = graph
-        self.visited = set()
+        self.visited = defaultdict(int)
 
     def num_paths_flat(self, s, t):
-        adjs, paths = self.g.adj(s), 0
-        print(f'for s {s}, t {t}, adjs = {adjs}, paths = {paths}')
-        for v in adjs:
-            print(f'v {v}')
-            found = [False]
-            self.dfs(v, t, found)
-            if found[0]:
-                print(f'path found for v {v}')
-                paths += 1
-        print(f'paths = {paths}')
+        adjs, paths, found = self.g.adj(s), 0, [False]
+        self.dfs(s, t, found)
+        if not found[0]: return False
+
         return paths
 
     def num_paths(self, p, q):
@@ -166,34 +162,75 @@ class DFS:
     def dfs(self, s, t, found):
         print(f'starting dfs for s: {self.g.expand(s)}')
         print(f'visited = {self.visited}')
-        if s in self.visited: return
+        self.visited[s] += 1
         if s == t:
             print(f'path found')
             found[0] = True
             return
-        self.visited.add(s)
         print(f's {s}, t {t}')
         if not self.g.adj(s): return
         adjs = self.g.adj(s)
         print(f'adjs for s {s} = {adjs}')
         for w in self.g.adj(s):
-            if w not in self.visited:
-                self.dfs(w, t, found)
-        self.visited.clear()
+            self.dfs(w, t, found)
         return
 
 
 def cut_path(matrix):
-    g = Graph(grid=matrix)
-    dfs = DFS(graph=g)
+    if not matrix: return False
     m, n = len(matrix), len(matrix[0])
     if (m, n) == (1, 2) or (m, n) == (2, 1): return False
-    paths = dfs.num_paths((0, 0), (m - 1, n - 1))
-    if not paths or paths == 2: return False
-    return True
+    num_paths, paths, max_p, s, t = 0, {}, 0, (0, 0), (m - 1, n - 1)
+
+    def valid(p):
+        return None if not 0 <= p[0] <= m - 1 or not 0 <= p[1] <= n - 1 or matrix[p[0]][p[1]] == 0 else p
+
+    def r(p):
+        # print(f'returning from r(p) {p[0], p[1] + 1}')
+        return p[0], p[1] + 1
+
+    def d(p):
+        return p[0] + 1, p[1]
+
+    def right(p):
+        return None if not valid(p) or not valid(r(p)) else r(p)
+
+    def bottom(p):
+        return None if not valid(p) or not valid(d(p)) else d(p)
+
+    def rb(p):
+        rp, bp = right(p), bottom(p)
+        if not rp and not bp: return None
+        if not rp: return [bp]
+        if not bp: return [rp]
+        return [rp, bp]
+
+    def not_st(p):
+        return p != s and p != t
+
+    def dfs(u, v):
+        nonlocal max_p, num_paths
+        if u == v: return True
+        nps, found = rb(u), False
+        for np in nps:
+            f = dfs(np, v)
+            if f: found = True
+            if f and not_st(np):
+                if np in paths: paths[np] += 1
+                else: paths[np] = 1
+                num_paths += 1; max_p = max(max_p, paths[np])
+        return found
+
+    found = dfs(s, t)
+    print(f'found = {found}')
+    print(f'num paths = {num_paths}')
+    print(f'max paths = {max_p}')
+    if not found: return True
+    print(f'paths = {paths}')
+    return max_p == num_paths
 
 if __name__ == '__main__':
-    grid = [[1,1,0,0,0,0],[1,1,1,1,1,1],[1,1,1,1,1,1],[1,1,1,1,0,1],[0,0,0,1,1,1],[0,0,0,1,0,1],[0,0,0,1,0,1],[0,0,0,1,0,1],[0,0,0,1,0,1],[0,0,0,1,1,1]]
+    grid = [[1,1,1,0,0],[1,0,1,0,0],[1,1,1,1,1],[0,0,1,1,1],[0,0,1,1,1]]
     for line in grid:
         print(line)
     print(f'm = {len(grid)}, n = {len(grid[0])}')
