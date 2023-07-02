@@ -1,5 +1,5 @@
 """
-98. Validate Binary Search Tree
+98. Validate 02 Binary Search Tree
 Medium
 14.9K
 1.2K

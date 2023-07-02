@@ -1,5 +1,5 @@
 """
-2476. Closest Nodes Queries in a Binary Search Tree
+2476. Closest Nodes Queries in a 02 Binary Search Tree
 Medium
 329
 86

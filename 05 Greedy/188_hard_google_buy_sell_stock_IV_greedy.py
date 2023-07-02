@@ -45,7 +45,7 @@ Identifying buy sell prices / profits reduces to Problem 122 Buy Sell Stock II.
 
 The above reduction is wrong.
 
-The right Dynamic Programming approach is as follows:
+The right 03 Dynamic Programming approach is as follows:
 
 Let's consider dp[j, k] as the max profit with at most k transactions at the end of day n.
 

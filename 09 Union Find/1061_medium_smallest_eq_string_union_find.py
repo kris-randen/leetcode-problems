@@ -1,5 +1,5 @@
 """
-1061. Lexicographically Smallest Equivalent String Medium
+1061. Lexicographically Smallest Equivalent 08 String Medium
 
 You are given two strings of the same length s1 and s2 and a string baseStr.
 

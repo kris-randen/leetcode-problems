@@ -1,5 +1,5 @@
 """
-1427. Perform String Shifts
+1427. Perform 08 String Shifts
 Easy
 214
 5
