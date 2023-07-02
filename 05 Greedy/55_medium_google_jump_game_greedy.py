@@ -58,3 +58,12 @@ def jump_game(steps):
         if i > m: return False
         m = max(m, i + steps[i])
     return True
+
+# 2nd July 2023 Jump Game 02 attempt
+
+def jump_game_02(v):
+    m = 0
+    for i, p in enumerate(v):
+        if i > m: return False
+        j = i + p; m = m if m > j else j
+    return True
