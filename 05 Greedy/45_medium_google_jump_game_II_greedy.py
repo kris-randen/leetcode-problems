@@ -62,6 +62,20 @@ def min_steps_long(abc):
         i += delta; s += 2
     return s
 
+# 2nd Jul 2023 Practice 02: Successful attempt.
+
+def jumps_02(v):
+    n = len(v)
+    if n < 2: return 0
+    l, r, j, m = 0, v[0], 1, 0
+    if r >= n - 1: return j
+    while r < n - 1:
+        j += 1
+        for i in range(l, r + 1):
+            s = i + v[i]; m = max(m, s)
+        l = r; r = m
+    return j
+
 if __name__ == '__main__':
     s = [5,9,3,2,1,0,2,3,3,1,0,0]
     print(min_steps_long(s))
