@@ -67,3 +67,12 @@ def min_sub_size_sum(v, t):
 
 
 
+
+
+
+
+
+
+
+
+
