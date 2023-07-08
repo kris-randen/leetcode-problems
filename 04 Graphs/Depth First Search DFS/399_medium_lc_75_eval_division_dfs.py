@@ -34,7 +34,39 @@ Output: [0.50000,2.00000,-1.00000,-1.00000]
 
 """
 
+
+"""
+
+Python Depth-First Search (DFS) and Union-Find Beats 95%
+kris-randen
+237
+3
+an hour ago
+Python3
+Intuition
+Depth-First Search (DFS) and Union-Find
+We use union-find with path compression to store values already computed using DFS.
+
+Approach
+We can use bare DFS but that will lead to recomputing many paths again and again. So a more efficient way is to cache this information. We can do that using a map / dict but instead a better more elegant way is to use a special edge-weighted union-find graph datastructure.
+
+This graph a disjoint-set of all symbols added to the graph through the equations. Every time we insert / add an equation we make the numerator the parent of the denominator by assigning the num as the id for denom.
+
+A natural root emerges just like in union-find. Every time we are given a query we check if the two symbols in the query belong to the same disjoint-set. If not we return -1.
+
+Complexity
+Time complexity:
+O(m * alpha(n)) where m is the number of operations aka equations + queries. alpha(n) is the inverse Ackerman function.
+
+Note that eventually if the number of queries far outweighs the number of equations we'll reach O(m) eventually as the fully path compressed union-find graph will be able to return every query [a, b] by looking the common root r and the returning (a / r) * (r / b).
+
+Space complexity:
+O(n ^ 2) as we could end up storing almost every pair of symbols in the edge-weighted graph. This could be futher simplified to O(n) by recognizing that after full path compression all we need is a tree / star where each symbol is connedted to the common root.
+
+"""
+
 from collections import defaultdict
+
 from typing import List
 
 
@@ -68,7 +100,6 @@ class Graph:
         return path
 
     def compress(self, c):
-        print(f'compressing path for c = {c}')
         path = self.path(c)
         n = len(path)
         root = path[-1]
@@ -78,8 +109,7 @@ class Graph:
             w = path[i - 1]
             self.g[root][v] = product
             self.g[v][root] = 1 / product
-            print(f'v = {v}, w = {w}')
-            print(f'id = {self.id}')
+            self.search(v, w)
             product = product * self.g[v][w]
             self.assign(v, root)
             self.assign(w, root)
@@ -89,7 +119,6 @@ class Graph:
         return self.compress(c)
 
     def iso_root(self, p, q):
-        print(f'iso_root eval p = {p}, q = {q}')
         return self.root(p) == self.root(q)
 
     def find(self, p, q):
@@ -99,6 +128,30 @@ class Graph:
         r, s = self.root(p), self.root(q)
         l, m = self.g[p][r], self.g[s][q]
         return l * m
+
+    def search(self, v, w):
+        if w in self.g[v] and v in self.g[w]: return
+        if w in self.g[v] and v not in self.g[w]:
+            self.g[w][v] = 1 / self.g[v][w];
+            return
+        if v in self.g[w] and w not in self.g[v]:
+            self.g[v][w] = 1 / self.g[w][v];
+            return
+        visited = defaultdict(int)
+
+        def dfs(i, w, prod):
+            if i in visited: return
+            visited[i] = prod
+            if i == w: return
+            for u in self.g[i]:
+                if u != i:
+                    prod = visited[i] * self.g[i][u]
+                    dfs(u, w, prod)
+
+        dfs(v, w, 1)
+        prod = visited[w]
+        self.g[v][w] = prod
+        self.g[w][v] = 1 / prod
 
     def add_edge(self, v, w, val):
         self.g[v][w] = val
@@ -111,8 +164,8 @@ class Graph:
         else:
             self.assign(p, q)
             self.sz[q] += self.sz[p]
-        # print(f'p = {p}, q = {q}, v = {v}, w = {w}')
         self.g[p][q] = self.g[p][v] * val * self.g[w][q]
+        self.g[q][p] = 1 / self.g[p][q]
 
     def add_edges(self, eqs, vals):
         for i in range(len(eqs)):
@@ -122,8 +175,7 @@ class Graph:
     def queries(self, qs):
         res = []
         for q in qs:
-            print(f'q = {q}')
-            v, w = q;
+            v, w = q
             res.append(self.find(v, w))
         return res
 
@@ -132,9 +184,8 @@ class Solution:
     def calcEquation(self, equations: List[List[str]], values: List[float], queries: List[List[str]]) -> List[float]:
         sbs = set()
         for eq in equations:
-            sbs.add(eq[0])
+            sbs.add(eq[0]);
             sbs.add(eq[1])
         g = Graph(sbs)
         g.add_edges(equations, values)
-        print(g.g)
         return g.queries(queries)
