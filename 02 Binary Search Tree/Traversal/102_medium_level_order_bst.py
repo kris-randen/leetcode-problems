@@ -38,10 +38,10 @@ def level_order_leet_long(node, path):
         cs, vals = [], []
         for p in ps:
             vals.append(p)
-            if p.left:
-                cs.append(p.left)
-            if p.right:
-                cs.append(p.right)
+            if p.is_left:
+                cs.append(p.is_left)
+            if p.is_right:
+                cs.append(p.is_right)
         q.put(cs)
         path.append(vals)
     return path
@@ -52,12 +52,12 @@ def level_order_leet(node):
     for ps in q:
         cs, vals = [], []
         for p in ps:
-            if p: vals += [p.val]; cs += p.left, p.right
+            if p: vals += [p.val]; cs += p.is_left, p.is_right
         if cs: q += [cs]; path += [vals]
     return path
 
 def level_order(node):
     q, path = [node], []
     for p in q:
-       if p: path.append(p.val); q += p.left, p.right
+       if p: path.append(p.val); q += p.is_left, p.is_right
     return path

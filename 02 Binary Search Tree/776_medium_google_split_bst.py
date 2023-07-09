@@ -10,15 +10,15 @@ class TreeNode:
         self.right = right
 
 def left_rotate(h):
-    r = h.right
-    h.right = r.left
-    r.left = h
+    r = h.is_right
+    h.is_right = r.is_left
+    r.is_left = h
     return r
 
 def right_rotate(h):
-    l = h.left
-    h.left = l.right
-    l.right = h
+    l = h.is_left
+    h.is_left = l.is_right
+    l.is_right = h
     return l
 
 def get(node, val):
@@ -45,10 +45,10 @@ def level_traversal(h):
     while not q.empty():
         g = q.get()
         array.append(g)
-        if g.left is not None:
-            q.put(g.left)
-        if g.right is not None:
-            q.put(g.right)
+        if g.is_left is not None:
+            q.put(g.is_left)
+        if g.is_right is not None:
+            q.put(g.is_right)
     return array
 
 class Solution:

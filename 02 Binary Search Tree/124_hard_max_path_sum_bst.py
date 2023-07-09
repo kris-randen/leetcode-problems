@@ -39,7 +39,7 @@ def max_path_sum(root):
     def path_sum(node):
         nonlocal max_sum
         if not node: return 0
-        l, r = path_sum(node.left), path_sum(node.right)
+        l, r = path_sum(node.is_left), path_sum(node.is_right)
         left, right = max(l, 0), max(r, 0)
         max_sum = max(max_sum, left + right + node.val)
         return max(left + node.val, right + node.val)

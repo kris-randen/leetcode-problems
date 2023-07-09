@@ -34,7 +34,7 @@ def zigzag(node):
     q, r, level, cs, vs = [[node]], [], 0, [], []
     for ps in q:
         for p in ps:
-            if p: vs += [p.val]; ds = [p.left, p.right]; cs += ds
+            if p: vs += [p.val]; ds = [p.is_left, p.is_right]; cs += ds
         if cs:
             vs = vs if level % 2 == 0 else reversed(vs)
             q += [cs]; r += [vs]; level += 1; cs = []; vs = []

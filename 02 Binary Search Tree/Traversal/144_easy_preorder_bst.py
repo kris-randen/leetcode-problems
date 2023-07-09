@@ -38,17 +38,17 @@ class TreeNode:
 
 def children(node):
     if not node: return []
-    if not node.left and not node.right: return []
-    if not node.left: return [node.right]
-    if not node.right: return [node.left]
-    return [node.left, node.right]
+    if not node.is_left and not node.is_right: return []
+    if not node.is_left: return [node.is_right]
+    if not node.is_right: return [node.is_left]
+    return [node.is_left, node.is_right]
 
 def grandchildren(node):
     if not node: return []
-    if not node.left and not node.right: return []
-    if not node.left: return children(node.right)
-    if not node.right: return children(node.left)
-    return children(node.left) + children(node.right)
+    if not node.is_left and not node.is_right: return []
+    if not node.is_left: return children(node.is_right)
+    if not node.is_right: return children(node.is_left)
+    return children(node.is_left) + children(node.is_right)
 
 def preorder_stack(node, path):
     if not node: return
@@ -58,17 +58,17 @@ def preorder_stack(node, path):
         if p not in visited:
             path.append(p.val); visited.add(p)
         else: p = de.pop()
-        if p.left and p.left not in visited:
-            de.append(p.left)
-        if not p.left or p.left in visited:
-            if p.right and p.right not in visited:
-                de.append(p.right)
+        if p.is_left and p.is_left not in visited:
+            de.append(p.is_left)
+        if not p.is_left or p.is_left in visited:
+            if p.is_right and p.is_right not in visited:
+                de.append(p.is_right)
             else: continue
 
 
 def preorder(node, path):
     if not node: return
     path.append(node.val)
-    preorder(node.left, path)
-    preorder(node.right, path)
+    preorder(node.is_left, path)
+    preorder(node.is_right, path)
 

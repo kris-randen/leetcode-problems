@@ -38,11 +38,11 @@ class TreeNode:
 def inorder_succ(node, key):
     if not node: return None
     if key < node.val:
-        t = inorder_succ(node.left, key)
+        t = inorder_succ(node.is_left, key)
         return t if t is not None else TreeNode(node.val)
-    if key > node.val: return inorder_succ(node.right, key)
+    if key > node.val: return inorder_succ(node.is_right, key)
     if key == node.val:
-        l, r = inorder_succ(node.left, key), inorder_succ(node.right, key)
+        l, r = inorder_succ(node.is_left, key), inorder_succ(node.is_right, key)
         if not l and not r: return None
         if not l: return r
         if not r: return l

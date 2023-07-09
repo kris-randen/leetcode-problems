@@ -52,8 +52,8 @@ class TreeNode:
 def validate_01(node, less=float('inf'), more=float('-inf')):
     if not node: return True
     if node.val >= less or node.val <= more: return False
-    return validate_01(node.left, min(less, node.val), more) and \
-           validate_01(node.right, less, max(more, node.val))
+    return validate_01(node.is_left, min(less, node.val), more) and \
+           validate_01(node.is_right, less, max(more, node.val))
 
 
 

@@ -42,9 +42,9 @@ def ceil(node, key):
     if not node: return None
     if node.val == key: return node.val
     if key > node.val:
-        if node.right: return ceil(node.right, key)
+        if node.is_right: return ceil(node.is_right, key)
         else: return None
-    t = ceil(node.left, key)
+    t = ceil(node.is_left, key)
     return t if t is not None else node.val
 
 
@@ -52,9 +52,9 @@ def floor(node, key):
     if not node: return None
     if node.val == key: return node.val
     if key < node.val:
-        if node.left: return floor(node.left, key)
+        if node.is_left: return floor(node.is_left, key)
         else: return None
-    t = floor(node.right, key)
+    t = floor(node.is_right, key)
     return t if t is not None else node.val
 
 # def closest(node, queries, indices, answers):
@@ -79,17 +79,17 @@ def ceils(node, queries, indices, answers):
     for i in indices:
         if queries[i] == node.val: answers[i][1] = node.val
         if queries[i] > node.val:
-            if not node.right: answers[i][1] = -1
+            if not node.is_right: answers[i][1] = -1
             else: right.append(i)
         if queries[i] < node.val:
-            if not node.left: answers[i][1] = node.val
+            if not node.is_left: answers[i][1] = node.val
             else: left.append(i)
-    if node.left:
-        ceils(node.left, queries, left, answers)
+    if node.is_left:
+        ceils(node.is_left, queries, left, answers)
         for i in left:
             answers[i][1] = node.val if answers[i][1] == -1 else answers[i][1]
-    if node.right:
-        ceils(node.right, queries, right, answers)
+    if node.is_right:
+        ceils(node.is_right, queries, right, answers)
 
 def floors(node, queries, indices, answers):
     if not node: return
@@ -97,15 +97,15 @@ def floors(node, queries, indices, answers):
     for i in indices:
         if queries[i] == node.val: answers[i][0] = node.val
         if queries[i] > node.val:
-            if not node.right: answers[i][0] = node.val
+            if not node.is_right: answers[i][0] = node.val
             else: right.append(i)
         if queries[i] < node.val:
-            if not node.left: answers[i][0] = -1
+            if not node.is_left: answers[i][0] = -1
             else: left.append(i)
-    if node.left:
-        floors(node.left, queries, left, answers)
-    if node.right:
-        floors(node.right, queries, right, answers)
+    if node.is_left:
+        floors(node.is_left, queries, left, answers)
+    if node.is_right:
+        floors(node.is_right, queries, right, answers)
         for i in right:
             answers[i][0] = node.val if answers[i][0] == -1 else answers[i][0]
 

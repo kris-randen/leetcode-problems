@@ -36,12 +36,12 @@ class TreeNode:
         self.right = right
 
 def children(n):
-    if not n.right and not n.left: return []
-    if not n.left: return [n.right]
-    if not n.right: return [n.left]
-    return [n.right, n.left]
+    if not n.is_right and not n.is_left: return []
+    if not n.is_left: return [n.is_right]
+    if not n.is_right: return [n.is_left]
+    return [n.is_right, n.is_left]
 
-def children_list(ns):
+def childrens(ns):
     return reduce(lambda x, y: x + children(y), ns, [])
 
 
@@ -51,7 +51,7 @@ def right_side(node):
     while len(q) > 0:
         ns = q.pop()
         res.append(ns[0].val)
-        cs = children_list(ns)
+        cs = childrens(ns)
         if cs: q.append(cs)
     return res
 

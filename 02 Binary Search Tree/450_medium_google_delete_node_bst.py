@@ -41,27 +41,27 @@ Output: []
 
 def min_01(node):
     if not node: return None
-    if not node.left: return node
-    return min_01(node.left)
+    if not node.is_left: return node
+    return min_01(node.is_left)
 
 
 def delete_min_01(node):
     if not node: return None
-    if not node.left: return node.right
-    node.left = delete_min_01(node.left)
+    if not node.is_left: return node.is_right
+    node.is_left = delete_min_01(node.is_left)
     return node
 
 def delete_01(node, key):
     if not node: return None
-    if key < node.val: node.left = delete_01(node.left, key)
-    if key > node.val: node.right = delete_01(node.right, key)
+    if key < node.val: node.is_left = delete_01(node.is_left, key)
+    if key > node.val: node.is_right = delete_01(node.is_right, key)
     if key == node.val:
-        if not node.left: return node.right
-        if not node.right: return node.left
+        if not node.is_left: return node.is_right
+        if not node.is_right: return node.is_left
         t = node
-        node = min(t.right)
-        node.right = delete_min_01(t.right)
-        node.left = t.left
+        node = min(t.is_right)
+        node.is_right = delete_min_01(t.is_right)
+        node.is_left = t.is_left
     return node
 
 
@@ -76,31 +76,31 @@ def delete_01(node, key):
 def find(node, key):
     if not node: return None
     if key == node.val: return node.val
-    if key < node.val: return find(node.left, key)
-    if key > node.val: return find(node.right, key)
+    if key < node.val: return find(node.is_left, key)
+    if key > node.val: return find(node.is_right, key)
 
 def get_min(node):
     if not node: return None
-    if not node.left: return node.val
-    return get_min(node.left)
+    if not node.is_left: return node.val
+    return get_min(node.is_left)
 
 def delete_min(node):
     if not node: return None
-    if not node.left: return node.right
-    node.left = delete_min(node.left)
+    if not node.is_left: return node.is_right
+    node.is_left = delete_min(node.is_left)
     return node
 
 
 def delete(node, key):
     if not node: return None
-    if key < node.val: node.left = delete(node.left, key)
-    if key > node.val: node.right = delete(node.right, key)
-    if not node.left: return node.right
-    if not node.right: return node.left
+    if key < node.val: node.is_left = delete(node.is_left, key)
+    if key > node.val: node.is_right = delete(node.is_right, key)
+    if not node.is_left: return node.is_right
+    if not node.is_right: return node.is_left
     t = node
-    node = get_min(t.right)
-    node.right = delete_min(t.right)
-    node.left = t.left
+    node = get_min(t.is_right)
+    node.right = delete_min(t.is_right)
+    node.left = t.is_left
     return node
 
 

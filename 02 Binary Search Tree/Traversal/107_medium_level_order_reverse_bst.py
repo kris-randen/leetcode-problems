@@ -31,6 +31,6 @@ def level_order_reverse(node):
     for ps in q:
         for p in ps:
             if p:
-                vs += [p.val]; cs += [p.left, p.right]
+                vs += [p.val]; cs += [p.is_left, p.is_right]
         if cs: path += [vs]; q += [cs]; cs = []; vs = []
     return reversed(path)

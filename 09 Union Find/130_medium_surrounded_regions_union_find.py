@@ -90,10 +90,10 @@ class Board:
         return point if self.is_valid(point) else None
 
     def left(self, point):
-        return self.valid(point.left())
+        return self.valid(point.is_left())
 
     def right(self, point):
-        return self.valid(point.right())
+        return self.valid(point.is_right())
 
     def up(self, point):
         return self.valid(point.up())

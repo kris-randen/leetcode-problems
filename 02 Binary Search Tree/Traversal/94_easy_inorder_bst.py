@@ -38,9 +38,9 @@ class TreeNode:
 
 def inorder(node, path):
     if not node: return
-    inorder(node.left, path)
+    inorder(node.is_left, path)
     path.append(node)
-    inorder(node.right, path)
+    inorder(node.is_right, path)
 
 def inorder_stack(node, path):
     if not node: return
@@ -48,13 +48,13 @@ def inorder_stack(node, path):
     de.append(node)
     while len(de) != 0:
         p = de[-1]  # peek
-        if p.left and p.left not in visited:
-            de.append(p.left)
-        if not p.left or p.left in visited:
+        if p.is_left and p.is_left not in visited:
+            de.append(p.is_left)
+        if not p.is_left or p.is_left in visited:
             p = de.pop()
             path.append(p.val)
             visited.add(p)
-            if not p.right or p.right in visited:
+            if not p.is_right or p.is_right in visited:
                 continue
-            else: de.append(p.right)
+            else: de.append(p.is_right)
 

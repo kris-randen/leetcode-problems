@@ -35,10 +35,10 @@ def postorder_stack(node, path):
     de, visited = deque([node]), set()
     while len(de) != 0:
         p = de[-1]
-        if p.left and p.left not in visited:
-            de.append(p.left)
-        if not p.left or p.left in visited:
-            if p.right and p.right not in visited: de.append(p.right)
+        if p.is_left and p.is_left not in visited:
+            de.append(p.is_left)
+        if not p.is_left or p.is_left in visited:
+            if p.is_right and p.is_right not in visited: de.append(p.is_right)
             else:
                 p = de.pop()
                 # if p not in visited:
@@ -47,6 +47,6 @@ def postorder_stack(node, path):
 
 def postorder(node, path):
     if not node: return
-    postorder(node.left, path)
-    postorder(node.right, path)
+    postorder(node.is_left, path)
+    postorder(node.is_right, path)
     path.append(node.val)

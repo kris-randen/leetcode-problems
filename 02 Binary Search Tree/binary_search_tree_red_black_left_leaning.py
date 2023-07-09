@@ -87,7 +87,7 @@ class RedBlackBST:
         return node is not None and self.is_red(node.right) and not self.is_red(node.left)
 
     def needs_rotate_right(self, node: Node):
-        return node is not None and self.is_red(node.left) and self.is_red(node.left.left)
+        return node is not None and self.is_red(node.left) and self.is_red(node.left.is_left)
 
     def needs_flip_color(self, node: Node):
         return node is not None and self.is_red(node.left) and self.is_red(node.right)
@@ -95,8 +95,8 @@ class RedBlackBST:
     def rotate_left(self, h: Node):
         assert self.needs_rotate_left(h)
         r = h.right
-        h.right = r.left
-        r.left = h
+        h.right = r.is_left
+        r.is_left = h
         r.color = h.color
         h.color = RED
         return r
@@ -104,8 +104,8 @@ class RedBlackBST:
     def rotate_right(self, h: Node):
         assert self.needs_rotate_right(h)
         l = h.left
-        h.left = l.right
-        l.right = h
+        h.left = l.is_right
+        l.is_right = h
         l.color = h.color
         h.color = RED
 
