@@ -64,6 +64,30 @@ def delete_01(node, key):
         node.is_left = t.is_left
     return node
 
+# Delete Node BST Practice 02 9th Jul 2023
+
+def min_02(x):
+    if not x or not x.left: return x
+    return min_02(x.left)
+
+def delete_min_02(x):
+    if not x: return None
+    if not x.left: return x.right
+    x.left = delete_min_02(x.left)
+    return x
+
+def delete_02(x, key):
+    if not x: return x
+    if key < x.val: x.left = delete_02(x.left, key)
+    if key > x.val: x.right = delete_02(x.right, key)
+    if key == x.val:
+        if not x.left: return x.right
+        if not x.right: return x.left
+        t = x; x = min_02(t.right)
+        x.right = delete_min_02(t.right)
+        x.left = t.left
+    return x
+
 
 
 
