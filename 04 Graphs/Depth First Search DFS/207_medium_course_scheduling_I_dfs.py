@@ -43,7 +43,6 @@ class Graph:
 
     def acyclic(self):
         def dfs(v):
-            print(f'visited = {self.visited}')
             if self.visited[v] == 1: return True
             if self.visited[v] == -1: return False
             self.visited[v] = -1
