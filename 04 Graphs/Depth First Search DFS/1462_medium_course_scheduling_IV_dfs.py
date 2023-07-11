@@ -37,62 +37,32 @@ Output: [true,true]
 """
 
 from collections import defaultdict
-from collections import deque
 
 class Graph:
-    def __init__(self, V, es):
+    def __init__(self, V, es, directed=True):
         self.V = V
+        self.directed = directed
         self.adj = defaultdict(set)
-        self.visited = [0] * V
-        for e in es:
-            self.add(e[0], e[1])
-        self.rewire()
+        self.adds(es)
+        self.reachable = [[(u == v or v in self.adj[u]) for v in range(self.V)] for u in range(self.V)]
+        self.closure()
 
-    def add(self, u, v):
-        self.adj[u].add(v)
+    def add(self, e):
+        u, v = e; self.adj[u].add(v)
+        if not self.directed: self.adj[v].add(u)
 
-    def clear_visited(self):
-        self.visited = [0] * self.V
+    def adds(self, es):
+        for e in es: self.add(e)
 
-    def sort(self):
-        topological = deque()
-
-        def dfs(v):
-            if self.visited[v]: return
-            self.visited[v] = 1
-            for w in self.adj[v]:
-                dfs(w)
-            topological.appendleft(v)
-
-        for v in range(self.V):
-            dfs(v)
-
-        self.clear_visited()
-        return topological
-
-    def rewire(self):
-        seq = self.sort()
-        print(f'rewire seq = {seq}')
-
-        def dfs_wire(v, heads):
-            if self.visited[v]: return
-            self.visited[v] = 1
-            for w in self.adj[v].copy():
-                dfs_wire(w, heads + [v])
-            for head in heads:
-                self.add(head, v)
-
-        while seq:
-            p = seq.popleft()
-            print(f'seq looping p = {p}')
-            dfs_wire(p, [])
-
-
-    def query(self, q):
-        return q[1] in self.adj[q[0]]
+    def closure(self):
+        for k in range(self.V):
+            for u in range(self.V):
+                for v in range(self.V):
+                    self.reachable[u][v] = self.reachable[u][v] or \
+                    (self.reachable[u][k] and self.reachable[k][v])
 
     def queries(self, qs):
-        return list(map(lambda q: self.query(q), qs))
+        return list(map(lambda q: self.reachable[q[0]][q[1]], qs))
 
 if __name__ == '__main__':
     n = 5

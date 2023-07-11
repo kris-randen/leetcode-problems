@@ -43,14 +43,13 @@ The city 0 has 1 neighboring city at a distanceThreshold = 2.
 
 from collections import defaultdict
 
-
 class Graph:
     def __init__(self, V, es, directed=False):
         self.V = V
         self.directed = directed
         self.adj = {v: {v: 0} for v in range(self.V)}
         self.adds(es)
-        self.dist = [[0 for _ in range(self.V)] for _ in range(self.V)]
+        self.dist = defaultdict(defaultdict)
         for u in range(self.V):
             for v in range(self.V):
                 self.dist[u][v] = self.adj[u][v] if v in self.adj[u] else (0 if u == v else float('inf'))
