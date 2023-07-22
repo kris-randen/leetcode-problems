@@ -1,4 +1,7 @@
+import math
 from collections import defaultdict
+from typing import List
+
 
 class IndexPQ:
     def __init__(self, keys):
@@ -110,15 +113,14 @@ class IndexPQ:
         self.heapify()
         return res
 
+class Edge:
+    def __init__(self, u, v, wt):
+        self.beg = u
+        self.end = v
+        self.wt = wt
 
-class Graph:
-    class Edge:
-        def __init__(self, u, v, wt):
-            self.beg = u
-            self.end = v
-            self.wt = wt
-
-    def __init__(self, V, es, directed=True):
+class Wegraph:
+    def __init__(self, V, es, directed=False):
         self.V = V
         self.directed = directed
         self.adj = defaultdict(set)
@@ -131,7 +133,119 @@ class Graph:
     def adds(self, es):
         for e in es: self.add(e)
 
-class Dijkstra:
+class HeapDict:
+    def __init__(self,order=None, dic=None):
+        self.pq, self.qp, self.dict, self.N = [-1], {}, {}, None
+        self.order = order if order else (lambda x, y: x if x < y else y)
+        if dic: pass
+
+    def size(self):
+        return len(self.pq) - 1 if not self.N else self.N
+
+    def is_empty(self): return self.size() == 0
+
+    def __getitem__(self, key):
+        return self.dict[key]
+
+    def up(self, i): return i // 2
+
+    def lt(self, i): return 2 * i
+
+    def rt(self, i): return (2 * i) + 1
+
+    def val(self, i): return self.dict[self.pq[i]]
+
+    def ord(self, i, j):
+        return i if self.order(self.val(i), self.val(j)) == self.val(i) else j
+
+    def pref(self, i, j):
+        if i and j: return self.ord(i, j)
+        return i if not j else i
+
+    def is_valid(self, i): return 1 <= i <= self.size()
+
+    def valid(self, i):
+        return i if self.is_valid(i) else None
+
+    def left(self, p): return self.valid(self.lt(p))
+
+    def right(self, p): return self.valid(self.rt(p))
+
+    def child(self, p): return self.pref(self.left(p), self.right(p))
+
+    def parent(self, c): return self.valid(self.up(c))
+
+    def bal_up(self, c):
+        p = self.parent(c)
+        return True if not p else self.pref(p, c) == p
+
+    def bal_down(self, p):
+        return self.pref(self.child(p), p) == p
+
+    def unbal_p(self, c):
+        if not self.bal_up(c): return self.parent(c)
+
+    def unbal_c(self, p):
+        if not self.bal_down(p): return self.child(p)
+
+    def swap(self, i, j):
+        self.pq[i], self.pq[j] = self.pq[j], self.pq[i]
+        self.qp[self.pq[i]], self.qp[self.pq[j]] = i, j
+
+    def lift(self, c):
+        p = self.unbal_p(c)
+        if p: self.swap(p, c)
+        return p
+
+    def drop(self, p):
+        c = self.unbal_c(p)
+        if c: self.swap(p, c)
+        return c
+
+    def swim(self, c):
+        while c: c = self.lift(c)
+
+    def sink(self, p):
+        while p: p = self.drop(p)
+
+    def heapify(self):
+        for i in range(self.size(), 0, -1): self.sink(i)
+
+    def sort(self):
+        self.N = self.size()
+        while self.N > 1:
+            self.swap(1, self.N); self.N -= 1; self.sink(1)
+        self.N = None
+        ordered = [self.dict[self.pq[i]] for i in range(1, self.size() + 1)]; self.heapify()
+        return ordered
+
+    def __setitem__(self, key, value):
+        self.dict[key], index = value, -1
+        if key in self.qp:
+            index = self.qp[key]
+        else:
+            self.pq.append(key); index = self.size()
+        self.swim(index); self.sink(index)
+
+    def top_key(self): return self.pq[1]
+
+    def top_val(self): return self.dict[self.top_key()]
+
+    def pop_key(self):
+        self.swap(1, self.size())
+        top = self.pq.pop()
+        self.sink(1)
+        self.qp.pop(top)
+        self.dict.pop(top)
+        return top
+
+    def pop_val(self):
+        top_val = self.dict[self.top_key()]
+        self.pop_key()
+        return top_val
+
+
+class DijkstraB:
     def __init__(self, g, s):
         self.g = g; self.V = self.g.V
         self.dist_to = [float('inf')] * self.V
@@ -154,18 +268,58 @@ class Dijkstra:
             self.pq.change(v, dist)
 
 
+class Dijkstra:
+    def __init__(self, g, s):
+        self.g = g; self.dist_to = [float('inf')] * self.g.V
+        self.dist_to[s] = 0; self.edge_to = [-1] * self.g.V
+        self.pq = HeapDict(); self.pq[s] = self.dist_to[s]
+
+        while not self.pq.is_empty():
+            v = self.pq.pop_key()
+            for e in self.g.adj[v]:
+                self.relax(e)
+
+    def relax(self, e):
+        u, v, wt = e.beg, e.end, e.wt
+        du, dv = self.dist_to[u], self.dist_to[v]
+        if dv > du + wt:
+            self.dist_to[v] = du + wt
+            self.edge_to[v] = e
+            self.pq[v] = self.dist_to[v]
+
+
+class Solution:
+    def maxProbability(self, n: int, edges: List[List[int]], succProb: List[float], s: int,
+                       t: int) -> float:
+        es = []
+        for i, edge in enumerate(edges):
+            es.append(Edge(edge[0], edge[1], -math.log(succProb[i])))
+        g = Wegraph(n, es)
+        dijk = Dijkstra(g, s)
+        return -math.exp(dijk.dist_to[t])
+
+
 if __name__ == '__main__':
-    v = [23, 0, 7, 5, 2, 11, 1]
-    pq = IndexPQ(v)
-    print(f'keys = {pq.keys}')
-    print(f'pq.. = {pq.pq}')
-    print(f'qp.. = {pq.qp}')
-    s = pq.sort()
-    print(f'sort = {s}')
-    print(f'pq.. = {pq.pq}')
-    print(f'pop = {pq.pop()}')
-    print(f'pop = {pq.pop()}')
-    print(f'pop = {pq.pop()}')
-    print(f'pq = {pq.pq}')
-    pq.change(3, -1)
-    print(f'pq = {pq.pq}')
+    # v = [23, 0, 7, 5, 2, 11, 1]
+    # pq = IndexPQ(v)
+    # print(f'keys = {pq.keys}')
+    # print(f'pq.. = {pq.pq}')
+    # print(f'qp.. = {pq.qp}')
+    # s = pq.sort()
+    # print(f'sort = {s}')
+    # print(f'pq.. = {pq.pq}')
+    # print(f'pop = {pq.pop()}')
+    # print(f'pop = {pq.pop()}')
+    # print(f'pop = {pq.pop()}')
+    # print(f'pq = {pq.pq}')
+    # pq.change(3, -1)
+    # print(f'pq = {pq.pq}')
+    # print(list(range(10, 1, -1)))
+    vs = [23, 0, 7, 5, 2, 11, 1]
+    pq = HeapDict()
+    for i, v in enumerate(vs): pq[i] = v
+    print(pq.dict)
+    print(pq.pq)
+
+
+
