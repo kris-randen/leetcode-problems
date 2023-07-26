@@ -207,3 +207,7 @@ class Solution:
     def minimumEffortPath(self, heights: List[List[int]]) -> int:
         g = Graph(heights); dijk = DijkstraHeapq(g, g.s, g.t)
         return dijk.dist_to[g.t]
+
+if __name__ == '__main__':
+    g = Graph()
+    pass
