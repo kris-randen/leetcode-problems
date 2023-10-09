@@ -96,14 +96,155 @@ Implementation
 """
 """
 API
+
+K: Key, V: Value, Z: Node
+
+class Node
+
+Optional[Node]      left
+Optional[Node]      right
+Value               val
+
+
+class BST
+
+Optional[Value]     get(key: Key)
+Node                put(key: Key, val: Value)
+Node                min()
+Node                max()
+Int                 size()
+Int                 rank(key: Key)
+(Key, Value)        select(index: Int)
+Int                 range_count(lo: Key, hi: Key)
+[Key]               range(lo: Key, hi: Key)
+(Key, Value)        delete_min()
+Optional[Node]      delete(key: Key)
+Optional[Key]       ceil(key: Key)
+Optional[Key]       floor(key: Key)
+
 """
-
-
 
 
 """
 Implementation
 """
+
+class Node:
+    def __init__(self, key, val):
+        self.key = key; self.val = val
+        self.left = self.right = None
+        self.count = 1; self.index = 0
+
+    def get(self, key):
+        if key == self.key: return self
+        return self.left if key < self.key else self.right
+
+
+
+class BST:
+    def __init__(self, root):
+        self.root = root
+
+    def size(self, node):
+        return 0 if not node else node.count
+
+    def rank_at(self, node, key):
+        if key == node.key:
+            return self.size(node.left)
+        if key < node.key:
+            return self.rank_at(node.left, key)
+        if key > node.key:
+            return self.rank_at(node.right, key) + 1 + self.size(node.left)
+
+    def rank(self, key):
+        return self.rank_at(self.root, key)
+
+    def get_at(self, node, key):
+        if not node or key == node.key: return node
+        if key < node.key: return self.get_at(node.left, key)
+        if key > node.key: return self.get_at(node.right, key)
+
+    def get(self, key): return self.get_at(self.root, key)
+
+    def contains(self, key): return self.get(key)
+
+    def put_at(self, node, key, val):
+        if not node: return node
+        if key < node.key: node.left = self.put_at(node.left, key, val)
+        elif key > node.key: node.right = self.put_at(node.right, key, val)
+        else: node.val = val
+        node.count = 1 + self.size(node.left) + self.size(node.right)
+        node.index = self.rank_at(node, node.key)
+        return node
+
+    def put(self, key, val):
+        self.root = self.put_at(self.root, key, val)
+
+    def unwrap_key(self, node):
+        return None if not node else node.key
+
+    def min_at(self, node):
+        if not node or not node.left: return node
+        return self.min_at(node.left)
+
+    def min(self):
+        return self.unwrap_key(self.min_at(self.root))
+
+    def max_at(self, node):
+        if not node or not node.right: return node
+        return self.max_at(node.right)
+
+    def max(self):
+        return self.unwrap_key(self.max_at(self.root))
+
+    def floor_at(self, node, key):
+        if not node or key == node.key: return node
+        if key < node.key: return self.floor_at(node.left, key)
+        if key > node.key:
+            t = self.floor_at(node.right, key)
+            return t if t else node
+
+    def floor(self, key):
+        return self.unwrap_key(self.floor_at(self.root, key))
+
+    def ceil_at(self, node, key):
+        if not node or key == node.key: return node
+        if key > node.key: return self.ceil_at(node.right, key)
+        if key < node.key:
+            t = self.ceil_at(node.right, key)
+            return t if t else node
+
+    def ceil(self, key):
+        return self.unwrap_key(self.ceil_at(self.root, key))
+
+    def delete_min_at(self, node):
+        if not node: return node
+        if not node.left: return node.right
+        node.left = self.delete_min_at(node.left)
+        node.count = 1 + self.size(node.left) + self.size(node.right)
+        return node
+
+    def delete_min(self):
+        self.root = self.delete_min_at(self.root)
+
+    def delete_at(self, node, key):
+        if not node: return node
+        if key < node.key:
+            node.left = self.delete_at(node.left, key)
+        elif key > node.key:
+            node.right = self.delete_at(node.right, key)
+        else:
+            if not node.left: return node.right
+            if not node.right: return node.left
+            t = node
+            node = self.min_at(node.right)
+            node.right = self.delete_min_at(node.right)
+            node.left = t.left
+        node.count = 1 + self.size(node.left) + self.size(node.right)
+        return node
+
+    def delete(self, key):
+        self.root = self.delete_at(self.root, key)
 
 
 
